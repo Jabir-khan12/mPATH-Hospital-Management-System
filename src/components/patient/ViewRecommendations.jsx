@@ -1,8 +1,5 @@
-// src/components/patient/ViewRecommendations.jsx
 import React, { useEffect, useState } from "react";
-// import axios from "axios";
-import api from "../utils/api";
-
+import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 
 const ViewRecommendations = () => {
@@ -12,11 +9,7 @@ const ViewRecommendations = () => {
 
   const fetchRecommendations = async () => {
     try {
-      // const res = await axios.get(
-      //   `http://localhost:5000/recommendations?patientId=${user.id}`
-      // );
-      const res = await api.get(`/users?email=${email}&password=${password}`);
-
+      const res = await api.get(`/recommendations?patientId=${user.id}`);
       setRecommendations(res.data);
     } catch (err) {
       console.error("Failed to fetch recommendations:", err);
@@ -26,8 +19,10 @@ const ViewRecommendations = () => {
   };
 
   useEffect(() => {
-    fetchRecommendations();
-  }, []);
+    if (user?.id) {
+      fetchRecommendations();
+    }
+  }, [user]);
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
