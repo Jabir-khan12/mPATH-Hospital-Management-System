@@ -1,7 +1,4 @@
-// src/components/admin/RecommendationForm.jsx
 import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import api from "../utils/api";
 import api from "../../utils/api";
 
 const RecommendationForm = () => {
@@ -12,9 +9,7 @@ const RecommendationForm = () => {
 
   const fetchPatients = async () => {
     try {
-      // const res = await axios.get("http://localhost:5000/users?role=patient");
       const res = await api.get("/users?role=patient");
-
       setPatients(res.data);
     } catch (err) {
       console.error("Failed to load patients:", err);
@@ -25,7 +20,6 @@ const RecommendationForm = () => {
     e.preventDefault();
     if (!patientId || !note)
       return alert("Please select a patient and write a note.");
-
     setLoading(true);
     try {
       await api.post("/recommendations", {
