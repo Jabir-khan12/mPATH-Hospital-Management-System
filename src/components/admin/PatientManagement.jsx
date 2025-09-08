@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 export default function PatientManagement() {
-  // States
   const [patients, setPatients] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [loadingRecs, setLoadingRecs] = useState(false);
   const [error, setError] = useState(null);
-
   const [activeNav, setActiveNav] = useState("Dashboard");
 
-  // Add Patient form state
   const [patientForm, setPatientForm] = useState({
     name: "",
     email: "",
@@ -22,36 +19,25 @@ export default function PatientManagement() {
     disabled: false,
   });
 
-  // Add Recommendation form state
   const [recForm, setRecForm] = useState({
     patientId: "",
     note: "",
   });
 
-  // Editing states
   const [editingPatientId, setEditingPatientId] = useState(null);
   const [editingPatientData, setEditingPatientData] = useState({});
   const [editingRecs, setEditingRecs] = useState([]);
 
-  // Fetch patients and recommendations on mount
-
-  // ← Paste the scroll position useEffect here
   useEffect(() => {
-    // Restore scroll position on mount
     const savedPosition = sessionStorage.getItem("scrollPosition");
     if (savedPosition) {
       window.scrollTo(0, parseInt(savedPosition, 10));
       sessionStorage.removeItem("scrollPosition");
     }
-
-    // Save scroll position before unload (refresh/close)
     const saveScroll = () => {
       sessionStorage.setItem("scrollPosition", window.scrollY);
     };
-
     window.addEventListener("beforeunload", saveScroll);
-
-    // Cleanup listener on unmount
     return () => {
       window.removeEventListener("beforeunload", saveScroll);
     };
@@ -62,7 +48,6 @@ export default function PatientManagement() {
     fetchRecommendations();
   }, []);
 
-  // Scroll position restore on refresh
   useEffect(() => {
     const savedPosition = sessionStorage.getItem("scrollPosition");
     if (savedPosition) {
@@ -76,7 +61,6 @@ export default function PatientManagement() {
     return () => window.removeEventListener("beforeunload", saveScroll);
   }, []);
 
-  // Fetch functions (adjust URLs to your backend)
   async function fetchPatients() {
     setLoadingPatients(true);
     try {
@@ -103,7 +87,6 @@ export default function PatientManagement() {
     }
   }
 
-  // Handlers for Add Patient Form inputs
   const handlePatientInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setPatientForm((prev) => ({
@@ -112,7 +95,6 @@ export default function PatientManagement() {
     }));
   };
 
-  // Add Patient submit handler
   async function handleAddPatient(e) {
     e.preventDefault();
     const newPatient = { ...patientForm, role: "patient" };
@@ -143,7 +125,6 @@ export default function PatientManagement() {
     }
   }
 
-  // Handlers for Add Recommendation inputs
   const handleRecInputChange = (e) => {
     const { name, value } = e.target;
     setRecForm((prev) => ({
@@ -152,7 +133,6 @@ export default function PatientManagement() {
     }));
   };
 
-  // Add Recommendation submit
   async function handleAddRecommendation(e) {
     e.preventDefault();
     if (!recForm.patientId || !recForm.note) {
@@ -174,7 +154,6 @@ export default function PatientManagement() {
     }
   }
 
-  // Toggle patient enabled/disabled status
   async function togglePatientStatus(patient) {
     const updatedPatient = { ...patient, disabled: !patient.disabled };
     try {
@@ -190,7 +169,6 @@ export default function PatientManagement() {
     }
   }
 
-  // Start editing a patient (loads patient + recommendations)
   async function startEditingPatient(patient) {
     setEditingPatientId(patient.id);
     setEditingPatientData({ ...patient });
@@ -208,14 +186,12 @@ export default function PatientManagement() {
     }
   }
 
-  // Cancel editing
   function cancelEditingPatient() {
     setEditingPatientId(null);
     setEditingPatientData({});
     setEditingRecs([]);
   }
 
-  // Handle editing patient form input change
   const changeEditingPatientData = (e) => {
     const { name, value, type, checked } = e.target;
     setEditingPatientData((prev) => ({
@@ -224,17 +200,14 @@ export default function PatientManagement() {
     }));
   };
 
-  // Handle editing recommendation note change
   const changeEditingRecNote = (recId, newNote) => {
     setEditingRecs((prev) =>
       prev.map((rec) => (rec.id === recId ? { ...rec, note: newNote } : rec))
     );
   };
 
-  // Save edited patient and recs
   async function saveEditingPatient() {
     try {
-      // Update patient data
       const resPatient = await fetch(
         `http://localhost:5000/users/${editingPatientId}`,
         {
@@ -245,7 +218,6 @@ export default function PatientManagement() {
       );
       if (!resPatient.ok) throw new Error("Failed to update patient");
 
-      // Update each recommendation
       for (const rec of editingRecs) {
         const resRec = await fetch(
           `http://localhost:5000/recommendations/${rec.id}`,
@@ -266,7 +238,6 @@ export default function PatientManagement() {
     }
   }
 
-  // Delete patient and their recommendations
   async function deletePatient(patientId) {
     if (
       !window.confirm(
@@ -275,7 +246,6 @@ export default function PatientManagement() {
     )
       return;
     try {
-      // Delete recommendations first
       const recsToDelete = recommendations.filter(
         (rec) => rec.patientId === patientId
       );
@@ -284,7 +254,6 @@ export default function PatientManagement() {
           method: "DELETE",
         });
       }
-      // Delete patient
       const res = await fetch(`http://localhost:5000/users/${patientId}`, {
         method: "DELETE",
       });
@@ -297,14 +266,12 @@ export default function PatientManagement() {
     }
   }
 
-  // Get patient recommendations from state
   function getPatientRecs(patientId) {
     return recommendations.filter((rec) => rec.patientId === patientId);
   }
 
   return (
     <div className="min-h-screen bg-white text-blue-900 p-6">
-      {/* Navbar */}
       <nav className="flex justify-between items-center bg-gray-100 px-6 py-3 rounded-md shadow mb-8 sticky top-0 z-10">
         <div className="font-bold text-xl select-none">mPATH</div>
         <ul className="flex space-x-6 text-sm font-semibold">
@@ -333,16 +300,12 @@ export default function PatientManagement() {
 
       {activeNav === "Dashboard" ? (
         <>
-          {/* Forms Section */}
           <section className="flex flex-wrap gap-6 mb-10 max-w-full">
-            {/* Add Patient Form */}
             <form
               onSubmit={handleAddPatient}
               className="bg-blue-50 border border-blue-300 rounded p-5 flex-1 min-w-[320px] max-w-xl"
             >
               <h2 className="font-semibold mb-4 text-lg">Add Patient</h2>
-
-              {/* Two fields per row */}
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <label className="flex flex-col">
                   Name*
@@ -365,7 +328,6 @@ export default function PatientManagement() {
                     required
                   />
                 </label>
-
                 <label className="flex flex-col">
                   Password*
                   <input
@@ -386,7 +348,6 @@ export default function PatientManagement() {
                     className="border border-blue-300 rounded p-1 text-xs"
                   />
                 </label>
-
                 <label className="flex flex-col">
                   DOB
                   <input
@@ -407,7 +368,6 @@ export default function PatientManagement() {
                     className="border border-blue-300 rounded p-1 text-xs"
                   />
                 </label>
-
                 <label className="flex flex-col">
                   Next Visit
                   <input
@@ -429,7 +389,6 @@ export default function PatientManagement() {
                   <span className="text-xs">Disable Patient</span>
                 </label>
               </div>
-
               <button
                 type="submit"
                 className="mt-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-semibold"
@@ -437,8 +396,6 @@ export default function PatientManagement() {
                 Add Patient
               </button>
             </form>
-
-            {/* Add Recommendation Form */}
             <form
               onSubmit={handleAddRecommendation}
               className="bg-blue-50 border border-blue-300 rounded p-5 flex-1 min-w-[280px] max-w-md"
@@ -479,8 +436,6 @@ export default function PatientManagement() {
               </button>
             </form>
           </section>
-
-          {/* Patient List */}
           <section className="overflow-x-auto">
             <h2 className="font-semibold mb-3 text-lg">Patients List</h2>
             {loadingPatients ? (
@@ -663,7 +618,6 @@ export default function PatientManagement() {
                           )}
                         </td>
                       </tr>
-                      {/* If editing this patient, show recommendations editing below */}
                       {editingPatientId === patient.id && (
                         <tr>
                           <td
