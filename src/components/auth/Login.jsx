@@ -1,4 +1,3 @@
-// src/components/auth/Login.jsx
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -13,15 +12,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       const user = await login(email, password);
       if (!user) {
         setError("Invalid email or password.");
         return;
       }
-
-      // Redirect based on role
       if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else if (user.role === "patient") {
@@ -29,7 +25,7 @@ const Login = () => {
       } else {
         setError("Unauthorized role. Please contact support.");
       }
-    } catch (err) {
+    } catch {
       setError("Login failed. Please try again.");
     }
   };
@@ -40,14 +36,12 @@ const Login = () => {
         <h2 className="h-[30px] flex items-center justify-center">
           <img
             className="h-10"
-            src="./assets/images/mPATH_logo.png"
+            src="/assets/images/mPATH_logo.png"
             alt="mPATH Logo"
           />
         </h2>
         <h2 className="text-xl font-bold mb-6 text-center">Login</h2>
-
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium mb-1">
@@ -64,7 +58,6 @@ const Login = () => {
               required
             />
           </div>
-
           <div className="mb-6">
             <label
               htmlFor="password"
@@ -83,7 +76,6 @@ const Login = () => {
               required
             />
           </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -92,7 +84,6 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
         <p className="mt-4 text-sm text-center text-gray-600">
           Patient?{" "}
           <a href="/register" className="text-blue-600 hover:underline">
@@ -100,9 +91,8 @@ const Login = () => {
           </a>
         </p>
       </div>
-
       <div className="w-1/2 p-8">
-        <img src="assets/images/frontpage-right.png" alt="Login Visual" />
+        <img src="/assets/images/frontpage-right.png" alt="Login Visual" />
       </div>
     </div>
   );
