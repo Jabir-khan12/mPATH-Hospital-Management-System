@@ -1,8 +1,6 @@
-// src/components/patient/MyDetails.jsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-// import axios from "axios";
-import api from "../utils/api";
+import api from "../../utils/api";
 
 const MyDetails = () => {
   const { user, setUser } = useAuth();
@@ -15,17 +13,11 @@ const MyDetails = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // await axios.patch(`http://localhost:5000/users/${user.id}`, {
-      //   name,
-      //   email,
-      //   password,
-      // });
       await api.patch(`/users/${user.id}`, {
         name,
         email,
         password,
       });
-
       alert("Profile updated successfully!");
       setUser({ ...user, name, email, password });
     } catch (err) {
