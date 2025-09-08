@@ -1,47 +1,44 @@
-// src/components/auth/Register.jsx
 import React, { useState } from "react";
-// import axios from "axios";
 import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [contactNo, setContactNo] = useState("");
-
+  const [contact, setContact] = useState("");
+  const [dob, setDob] = useState("");
+  const [lastVisit, setLastVisit] = useState("");
+  const [nextVisit, setNextVisit] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Check if email already exists
-      // const check = await axios.get(
-      //   `http://localhost:5000/users?email=${email}`
-      // );
       const check = await api.get(`/users?email=${email}`);
-
       if (check.data.length > 0) {
         alert("Email is already registered");
         return;
       }
-
-      // Add patient user
-      const res = await api.post("/users", {
+      const newPatient = {
         name,
-        contactNo, // ✅ new field
         email,
         password,
+        contact,
+        dob,
+        lastVisit,
+        nextVisit,
+        disabled: false,
         role: "patient",
-        status: "enabled", // ✅ new field
-      });
-
+      };
+      await api.post("/users", newPatient);
       alert("Account created successfully! You can now log in.");
-      navigate("/");
+      navigate("/login");
     } catch (err) {
-      console.error("Registration error:", err.response?.data || err.message);
+      console.error("Registration error:", err);
       alert("Something went wrong during registration.");
     } finally {
       setLoading(false);
@@ -54,72 +51,71 @@ const Register = () => {
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
           Patient Registration
         </h2>
-        <form onSubmit={handleRegister}>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Name
-            </label>
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Name</label>
             <input
-              id="name"
-              name="name"
               type="text"
-              autoComplete="name"
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="contactNo"
-              className="block text-sm font-medium mb-1"
-            >
-              Contact Number
-            </label>
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
-              id="contactNo"
-              name="contactNo"
-              type="text"
-              autoComplete="tel"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
-              value={contactNo}
-              onChange={(e) => setContactNo(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
               type="email"
-              autoComplete="email"
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium mb-1"
-            >
-              Password
-            </label>
+          <div>
+            <label className="block text-sm font-medium mb-1">Password</label>
             <input
-              id="password"
-              name="password"
               type="password"
-              autoComplete="new-password"
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Contact</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">DOB</label>
+            <input
+              type="date"
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Last Visit</label>
+            <input
+              type="date"
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+              value={lastVisit}
+              onChange={(e) => setLastVisit(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Next Visit</label>
+            <input
+              type="date"
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+              value={nextVisit}
+              onChange={(e) => setNextVisit(e.target.value)}
             />
           </div>
           <button
@@ -130,10 +126,9 @@ const Register = () => {
             {loading ? "Registering..." : "Register"}
           </button>
         </form>
-
         <p className="mt-4 text-sm text-center text-gray-600">
           Already have an account?{" "}
-          <a href="/" className="text-blue-600 hover:underline">
+          <a href="/login" className="text-blue-600 hover:underline">
             Login here
           </a>
         </p>
